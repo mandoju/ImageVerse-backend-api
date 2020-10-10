@@ -1,0 +1,23 @@
+{
+  "name": "imageverse-backend-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/mandoju/ImageVerse-backend-api.git",
+  "author": "Jorge Rama Krsna Mandoju <JorgeRamaKrsna@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/express": "^4.17.8",
+    "@types/node": "^14.11.8",
+    "nodemon": "^2.0.4",
+    "ts-node": "^9.0.0",
+    "typescript": "^4.0.3"
+  },
+  "scripts": { 
+    "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
