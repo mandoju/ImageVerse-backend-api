@@ -26,6 +26,7 @@
     "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write"
   },
   "dependencies": {
+    "aws-sdk": "^2.771.0",
     "express": "^4.17.1"
   }
 }
