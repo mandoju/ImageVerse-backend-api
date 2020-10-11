@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "aws-sdk": "^2.771.0",
+    "dynamoose": "^2.3.0",
     "express": "^4.17.1"
   }
 }
