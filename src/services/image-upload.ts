@@ -1,6 +1,7 @@
 import { S3 } from 'aws-sdk';
 import multer from 'multer';
 import multerS3 from 'multer-s3';
+import * as uuid from 'uuid';
 
 const s3 = new S3();
 
@@ -21,12 +22,10 @@ const upload = multer({
   storage: multerS3({
     acl: 'public-read',
     s3,
-    bucket: 'bwm-ng-dev',
-    metadata: function (req, file, cb) {
-      cb(null, { fieldName: 'TESTING_METADATA' });
-    },
+    bucket: 'imageverse-images.jorgerama.com.br',
     key: function (req, file, cb) {
-      cb(null, Date.now().toString());
+      const filename = `${uuid.v1()}-${file.originalname}`;
+      cb(null, filename);
     }
   })
 });
