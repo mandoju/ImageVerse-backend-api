@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import { Image } from '../models/Image';
+import { upload } from '../services/image-upload';
 
 const routes = Router();
+const singleUpload = upload.single('image');
 
 routes.get('/', async (req, res) => {
   const images = await Image.scan().exec();
@@ -14,8 +16,19 @@ routes.get('/:id', async (req, res) => {
 });
 
 routes.post('/', async (req, res) => {
-  const image = await Image.create(req.body);
-  return res.json(image);
+  singleUpload(req, res, async function (err: any) {
+    if (err) {
+      return res.status(422).send({
+        errors: [{ title: 'Image Upload Error', detail: err.message }]
+      });
+    }
+    const image = await Image.create({
+      title: req.body.title,
+      // @ts-ignore : Problem o @type, attribute location does exist on file
+      url: req.file.location
+    });
+    return res.json({ ...image });
+  });
 });
 
 routes.put('/:id', async (req, res) => {
