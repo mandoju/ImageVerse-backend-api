@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { Image } from '../models/Image';
+import { User } from '../models/User';
 import { upload } from '../services/image-upload';
 
 const routes = Router();
@@ -15,19 +16,28 @@ routes.get('/:id', async (req, res) => {
   return res.json(image);
 });
 
-routes.post('/', async (req, res) => {
+routes.post('/', upload.single('image'), async (req, res) => {
   singleUpload(req, res, async function (err: any) {
     if (err) {
       return res.status(422).send({
         errors: [{ title: 'Image Upload Error', detail: err.message }]
       });
     }
-    const image = await Image.create({
-      title: req.body.title,
-      // @ts-ignore : Problem o @type, attribute location does exist on file
-      url: req.file.location
-    });
-    return res.json({ ...image });
+    try {
+      const user = await User.get(req.body.creatorId);
+      const image = await Image.create({
+        title: req.body.title,
+        // @ts-ignore : Problem o @type, attribute location does exist on file
+        url: req.file.location,
+        creator: { ...user }
+      });
+      return res.json(image);
+    } catch (error) {
+      console.log(error.stack);
+      return res.status(500).send({
+        errors: [{ title: 'Internal Server Error', detail: error }]
+      });
+    }
   });
 });
 
