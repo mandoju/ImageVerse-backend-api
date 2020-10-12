@@ -31,7 +31,9 @@
     "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write"
   },
   "dependencies": {
+    "@types/cookie-session": "^2.0.41",
     "aws-sdk": "^2.771.0",
+    "cookie-session": "^1.4.0",
     "dynamoose": "^2.3.0",
     "express": "^4.17.1",
     "multer": "^1.4.2",
