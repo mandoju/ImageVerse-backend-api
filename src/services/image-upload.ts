@@ -2,6 +2,7 @@ import { S3 } from 'aws-sdk';
 import multer from 'multer';
 import multerS3 from 'multer-s3';
 import * as uuid from 'uuid';
+import { getAwsEnviromentVariables } from '../utils/enviroment';
 
 const s3 = new S3();
 
@@ -22,7 +23,7 @@ const upload = multer({
   storage: multerS3({
     acl: 'public-read',
     s3,
-    bucket: 'imageverse-images.jorgerama.com.br',
+    bucket: getAwsEnviromentVariables().awsImagesBucket,
     key: function (req, file, cb) {
       const filename = `${uuid.v1()}-${file.originalname}`;
       cb(null, filename);
