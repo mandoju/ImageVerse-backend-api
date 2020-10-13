@@ -29,3 +29,16 @@ export const getAwsEnviromentVariables = () => {
     awsRegion
   };
 };
+
+export const getApiEnviromentVariables = () => {
+  const port = process.env.PORT || '8000';
+  const cookieKey = process.env.COOKIE_KEY;
+  if (!cookieKey) {
+    throw new Error('Missing cookie key variable');
+  }
+
+  return {
+    port,
+    cookieKey
+  };
+};

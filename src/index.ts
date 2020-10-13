@@ -6,7 +6,10 @@ import { configurePassport } from './utils/passport';
 import { AuthRoutes } from './handlers/auth';
 import cookieSession from 'cookie-session';
 import passport from 'passport';
-import { getAwsEnviromentVariables } from './utils/enviroment';
+import {
+  getApiEnviromentVariables,
+  getAwsEnviromentVariables
+} from './utils/enviroment';
 
 const sdk = dynamoose.aws.sdk;
 sdk.config.update({
@@ -18,17 +21,19 @@ if (process.env.NODE_ENV === 'development') {
 configurePassport();
 
 const app = express();
-const port = process.env.PORT || '8000';
+const port = getApiEnviromentVariables().port;
 
-app.use(passport.initialize());
-app.use(passport.session());
 app.use(
   cookieSession({
     // milliseconds of a day
     maxAge: 24 * 60 * 60 * 1000,
-    keys: ['imageVerse-api-key']
+    name: 'imageverse-cookie',
+    keys: [getApiEnviromentVariables().cookieKey]
   })
 );
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use(routes);
 app.use('/auth', AuthRoutes);
 

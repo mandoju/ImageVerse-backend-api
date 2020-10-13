@@ -12,12 +12,11 @@ routes.get(
 
 routes.get('/google/redirect', passport.authenticate('google'), (req, res) => {
   res.send(req.user);
-  res.send('you reached the redirect URI');
 });
 
 routes.get('/logout', (req, res) => {
   req.logout();
-  res.send(req.user);
+  res.send({ message: 'ok' });
 });
 
 export const AuthRoutes = routes;
