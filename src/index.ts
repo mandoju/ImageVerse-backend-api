@@ -3,6 +3,8 @@ import * as dynamoose from 'dynamoose';
 import { routes } from './handlers/image';
 import { configurePassport } from './utils/passport';
 import { AuthRoutes } from './handlers/auth';
+import cookieSession from 'cookie-session';
+import passport from 'passport';
 
 const sdk = dynamoose.aws.sdk;
 sdk.config.update({
@@ -16,8 +18,17 @@ configurePassport();
 const app = express();
 const port = process.env.PORT || '8000';
 
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(
+  cookieSession({
+    // milliseconds of a day
+    maxAge: 24 * 60 * 60 * 1000,
+    keys: ['imageVerse-api-key']
+  })
+);
 app.use(routes);
-app.use('./auth', AuthRoutes);
+app.use('/auth', AuthRoutes);
 
 app.listen(port, () => {
   return console.log(`Server is listening on ${port}`);

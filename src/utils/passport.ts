@@ -23,13 +23,14 @@ export const configurePassport = () => {
             //if not, create a new user
             new User({
               id: profile.id,
-              email: profile.emails ? profile.emails[0] || '' : '',
+              email: profile.emails ? profile.emails[0].value || '' : '',
               name: profile.displayName,
               provider: 'google'
             })
               .save()
               .then((newUser) => {
-                done(undefined, newUser);
+                console.log({ ...newUser });
+                done(undefined, { ...newUser });
               });
           }
         });
@@ -37,11 +38,15 @@ export const configurePassport = () => {
     )
   );
 
+  passport.serializeUser((user, done) => {
+    done(null, user);
+  });
+
   passport.deserializeUser((id, done) => {
     // TODO: TypeCheck of id
     // @ts-ignore
     User.get(id).then((user) => {
-      done(null, user);
+      done(null, { ...user });
     });
   });
 };
