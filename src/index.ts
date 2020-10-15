@@ -4,7 +4,7 @@ import * as dynamoose from 'dynamoose';
 import { routes } from './handlers/image';
 import { configurePassport } from './utils/passport';
 import { AuthRoutes } from './handlers/auth';
-import cookieSession from 'cookie-session';
+import session from 'express-session';
 import passport from 'passport';
 import {
   getApiEnviromentVariables,
@@ -24,11 +24,14 @@ const app = express();
 const port = getApiEnviromentVariables().port;
 
 app.use(
-  cookieSession({
+  session({
     // milliseconds of a day
-    maxAge: 24 * 60 * 60 * 1000,
-    name: 'imageverse-cookie',
-    keys: [getApiEnviromentVariables().cookieKey]
+    secret: getApiEnviromentVariables().cookieKey,
+    resave: false,
+    cookie: {
+      secure: false,
+      maxAge: 60 * 60 * 1000 * 24 * 365
+    }
   })
 );
 app.use(passport.initialize());
