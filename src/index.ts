@@ -1,7 +1,7 @@
 require('dotenv').config();
 import express from 'express';
 import * as dynamoose from 'dynamoose';
-import { routes } from './handlers/image';
+import { ImageRoutes } from './handlers/image';
 import { configurePassport } from './utils/passport';
 import { AuthRoutes } from './handlers/auth';
 import session from 'express-session';
@@ -10,6 +10,7 @@ import {
   getApiEnviromentVariables,
   getAwsEnviromentVariables
 } from './utils/enviroment';
+import { UserRoutes } from './handlers/user';
 
 const sdk = dynamoose.aws.sdk;
 sdk.config.update({
@@ -37,8 +38,9 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(routes);
+app.use('/images', ImageRoutes);
 app.use('/auth', AuthRoutes);
+app.use('/profile', UserRoutes);
 
 app.listen(port, () => {
   return console.log(`Server is listening on ${port}`);

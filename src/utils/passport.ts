@@ -55,14 +55,13 @@ export const configurePassport = () => {
   });
 };
 
-export const isAuthenticated = (
+export function isAuthenticated(
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+) {
   if (req.user) {
-    next();
-  } else {
-    res.status(403).send({ message: 'Forbidden Access' });
+    return next();
   }
-};
+  res.status(401).json({ message: 'not authenticated!' });
+}

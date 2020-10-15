@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import passport from 'passport';
 import { Image } from '../models/Image';
 import { User } from '../models/User';
 import { upload } from '../services/image-upload';
@@ -63,4 +62,4 @@ routes.delete('/:id', isAuthenticated, async (req, res) => {
   return res.json({ msg: 'Deleted' });
 });
 
-export { routes };
+export const ImageRoutes = routes;
