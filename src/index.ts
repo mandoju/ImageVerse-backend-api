@@ -11,14 +11,16 @@ import {
   getAwsEnviromentVariables
 } from './utils/enviroment';
 import { UserRoutes } from './handlers/user';
+import { LikeRoutes } from './handlers/like';
+import bodyParser from 'body-parser';
 
 const sdk = dynamoose.aws.sdk;
 sdk.config.update({
   region: getAwsEnviromentVariables().awsRegion
 });
-if (process.env.NODE_ENV === 'development') {
-  dynamoose.aws.ddb.local('http://localhost:8001');
-}
+// if (process.env.NODE_ENV === 'development') {
+//   dynamoose.aws.ddb.local('http://localhost:8001');
+// }
 configurePassport();
 
 const app = express();
@@ -41,6 +43,7 @@ app.use(passport.session());
 app.use('/images', ImageRoutes);
 app.use('/auth', AuthRoutes);
 app.use('/profile', UserRoutes);
+app.use('/like', LikeRoutes);
 
 app.listen(port, () => {
   return console.log(`Server is listening on ${port}`);
