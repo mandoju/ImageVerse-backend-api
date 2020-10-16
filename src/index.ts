@@ -1,15 +1,16 @@
 require('dotenv').config();
 import express from 'express';
 import * as dynamoose from 'dynamoose';
-import { routes } from './handlers/image';
+import { ImageRoutes } from './handlers/image';
 import { configurePassport } from './utils/passport';
 import { AuthRoutes } from './handlers/auth';
-import cookieSession from 'cookie-session';
+import session from 'express-session';
 import passport from 'passport';
 import {
   getApiEnviromentVariables,
   getAwsEnviromentVariables
 } from './utils/enviroment';
+import { UserRoutes } from './handlers/user';
 
 const sdk = dynamoose.aws.sdk;
 sdk.config.update({
@@ -24,18 +25,22 @@ const app = express();
 const port = getApiEnviromentVariables().port;
 
 app.use(
-  cookieSession({
+  session({
     // milliseconds of a day
-    maxAge: 24 * 60 * 60 * 1000,
-    name: 'imageverse-cookie',
-    keys: [getApiEnviromentVariables().cookieKey]
+    secret: getApiEnviromentVariables().cookieKey,
+    resave: false,
+    cookie: {
+      secure: false,
+      maxAge: 60 * 60 * 1000 * 24 * 365
+    }
   })
 );
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(routes);
+app.use('/images', ImageRoutes);
 app.use('/auth', AuthRoutes);
+app.use('/profile', UserRoutes);
 
 app.listen(port, () => {
   return console.log(`Server is listening on ${port}`);

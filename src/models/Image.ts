@@ -16,8 +16,17 @@ const imageSchema = new dynamoose.Schema(
     url: {
       type: String
     },
-    // @ts-ignore: Wrong
-    creator: User
+    likeCount: {
+      type: String
+    },
+    creator: {
+      // @ts-ignore: Right acordding argumentation
+      type: User,
+      index: {
+        name: 'creatorIndex',
+        global: true
+      }
+    }
   },
   {
     timestamps: true

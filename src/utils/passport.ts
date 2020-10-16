@@ -1,3 +1,4 @@
+import { Request, Response, NextFunction } from 'express';
 import passport from 'passport';
 import { Strategy } from 'passport-google-oauth20';
 import { User } from '../models/User';
@@ -15,25 +16,28 @@ export const configurePassport = () => {
       },
       (accessToken, refreshToken, profile, done) => {
         //check if user already exists in our db with the given profile ID
-        User.get(profile.id).then((currentUser) => {
-          if (currentUser) {
-            //if we already have a record with the given profile ID
-            done(undefined, currentUser);
-          } else {
-            //if not, create a new user
-            new User({
-              id: profile.id,
-              email: profile.emails ? profile.emails[0].value || '' : '',
-              name: profile.displayName,
-              provider: 'google'
-            })
-              .save()
-              .then((newUser) => {
-                console.log({ ...newUser });
-                done(undefined, { ...newUser });
-              });
-          }
-        });
+        User.get(profile.id)
+          .then((currentUser) => {
+            if (currentUser) {
+              //if we already have a record with the given profile ID
+              done(undefined, currentUser);
+            } else {
+              //if not, create a new user
+              new User({
+                id: profile.id,
+                email: profile.emails ? profile.emails[0].value || '' : '',
+                name: profile.displayName,
+                provider: 'google'
+              })
+                .save()
+                .then((newUser) => {
+                  done(undefined, { ...newUser });
+                });
+            }
+          })
+          .catch((err) => {
+            done(err);
+          });
       }
     )
   );
@@ -50,3 +54,14 @@ export const configurePassport = () => {
     });
   });
 };
+
+export function isAuthenticated(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  if (req.user) {
+    return next();
+  }
+  res.status(401).json({ message: 'not authenticated!' });
+}
