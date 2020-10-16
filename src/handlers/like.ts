@@ -33,12 +33,24 @@ routes.post(
       }
       return res.json();
     } catch (error) {
-      console.log(error.stack);
       return res.status(500).send({
         errors: [{ title: 'Internal Server Error', detail: error }]
       });
     }
   }
 );
+
+routes.get('/user', isAuthenticated, async (req, res) => {
+  try {
+    //@ts-ignore
+    const userId: string = req.user!.id;
+    const userLikes = await Like.query({ userId }).all().exec(); //de(userId);
+    return res.json(userLikes);
+  } catch (error) {
+    return res.status(500).send({
+      errors: [{ title: 'Internal Server Error', detail: error }]
+    });
+  }
+});
 
 export const LikeRoutes = routes;
