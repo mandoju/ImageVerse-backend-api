@@ -8,9 +8,12 @@ const routes = Router();
 const singleUpload = upload.single('image');
 
 routes.get('/', async (req, res) => {
+  const page = Number(req.query.page) || 0;
+  const offset = page * 20;
   const images = await Image.findAll({
     include: 'User',
     limit: 20,
+    offset,
     order: [['createdAt', 'DESC']]
   });
   return res.json({ images });
