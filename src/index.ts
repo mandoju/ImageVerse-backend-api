@@ -5,13 +5,11 @@ import { configurePassport } from './utils/passport';
 import { AuthRoutes } from './handlers/auth';
 import session from 'express-session';
 import passport from 'passport';
-import {
-  getApiEnviromentVariables,
-  getAwsEnviromentVariables
-} from './utils/enviroment';
+import { getApiEnviromentVariables } from './utils/enviroment';
 import { UserRoutes } from './handlers/user';
 import { LikeRoutes } from './handlers/like';
 import cookieParser from 'cookie-parser';
+import { sequelize } from './services/database';
 
 try {
   sequelize

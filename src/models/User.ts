@@ -1,8 +1,6 @@
 import { Image } from './Image';
 import {
-  Sequelize,
   Model,
-  ModelDefined,
   DataTypes,
   HasManyGetAssociationsMixin,
   HasManyAddAssociationMixin,
@@ -50,9 +48,11 @@ class User
   // You can also pre-declare possible inclusions, these will only be populated if you
   // actively include a relation.
   public readonly images?: Image[]; // Note this is optional since it's only populated when explicitly requested in code
+  public readonly imagesLiked?: Image[];
 
   public static associations: {
     images: Association<User, Image>;
+    imagesLiked: Association<User, Image>;
   };
 }
 User.init(

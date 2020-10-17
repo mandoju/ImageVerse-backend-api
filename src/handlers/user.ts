@@ -14,8 +14,8 @@ routes.get('/images', isAuthenticated, async (req, res) => {
   const userId: string = req.user!.id;
   // TODO: Change to query for better performance
   // @ts-ignore: dynamoose type error.
-  const images = await Image.findAll({ where: { creator: userid } });
-  return res.json({ images });
+  const images = await Image.findAll({ where: { creator: userId } });
+  return res.json(images);
 });
 
 export const UserRoutes = routes;

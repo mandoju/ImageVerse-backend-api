@@ -1,5 +1,6 @@
 import { Model, DataTypes, Association, Optional } from 'sequelize';
 import { sequelize } from '../services/database';
+import { Like } from './Like';
 import { User } from './User';
 interface ImageAttributes {
   id: number;
@@ -55,6 +56,8 @@ Image.init(
   }
 );
 Image.belongsTo(User, { targetKey: 'id', foreignKey: 'creator' });
+Image.belongsToMany(User, { through: typeof Like, as: 'usersLiked' });
+User.belongsToMany(Image, { through: typeof Like, as: 'imagesLiked' });
 User.hasMany(Image);
 
 export { Image };
