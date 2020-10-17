@@ -3,7 +3,7 @@ import { sequelize } from '../services/database';
 import { User } from './User';
 import { Image } from './Image';
 interface LikeAttributes {
-  type: boolean;
+  type: string;
 }
 
 // Some attributes are optional in `User.build` and `User.create` calls
@@ -12,7 +12,7 @@ interface LikeCreationAttributes extends LikeAttributes {}
 class Like
   extends Model<LikeAttributes, LikeCreationAttributes>
   implements LikeAttributes {
-  public type!: boolean;
+  public type!: string;
   public UserId!: number;
   public ImageId!: number;
 
@@ -31,7 +31,7 @@ class Like
 Like.init(
   {
     type: {
-      type: DataTypes.BOOLEAN,
+      type: DataTypes.STRING(8),
       allowNull: true
     }
   },

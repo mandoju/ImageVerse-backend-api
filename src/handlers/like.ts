@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { bodyParserBodyMiddleware } from '../middlewares/bodyParser';
-import { Image } from '../models/Image';
 import { Like } from '../models/Like';
 import { User } from '../models/User';
+import { checkLikeValue } from '../utils/like';
 import { isAuthenticated } from '../utils/passport';
 
 const routes = Router();
@@ -16,27 +16,38 @@ routes.post(
       //@ts-ignore
       const UserId: number = Number(req.user!.id);
       const ImageId: number = Number(req.params.id);
+      let type: string = req.body.type;
+      if (!type) {
+        return res.send(400).send({ message: 'missing like type' });
+      }
       if (!ImageId) {
-        res.send(400).send({ message: 'missing image id' });
+        return res.send(400).send({ message: 'missing image id' });
       }
       //@ts-ignore
       const checkLiked = await Like.findOne({ where: { UserId, ImageId } });
+      if (type === 'remove') {
+        await checkLiked.destroy();
+        return res.json({ message: 'like deleted' });
+      }
       if (checkLiked) {
-        //@ts-ignore
-        Like.destroy({ where: { userId, imageId } });
+        checkLiked.update({
+          ...checkLiked,
+          type
+        });
       } else {
         await Like.create({
           //@ts-ignore
           UserId,
           //@ts-ignore
           ImageId,
-          type: true
+          type
         });
       }
       return res.json({ message: 'success' });
     } catch (error) {
-      return res.status(500).send({
-        errors: [{ title: 'Internal Server Error', detail: error }]
+      console.log(error.stack);
+      return res.status(500).json({
+        errors: [{ title: 'Internal Server Error', detail: error.message }]
       });
     }
   }
@@ -52,11 +63,11 @@ routes.get('/user', isAuthenticated, async (req, res) => {
     }
     //@ts-ignore
     const likedImages = await user.getImagesLiked();
-    return res.json(likedImages);
+    return res.send(likedImages);
   } catch (error) {
     console.log(error.stack);
     return res.status(500).send({
-      errors: [{ title: 'Internal Server Error', detail: error }]
+      errors: [{ title: 'Internal Server Error', detail: error.message }]
     });
   }
 });
