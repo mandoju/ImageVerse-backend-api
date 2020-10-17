@@ -40,7 +40,7 @@ export const configurePassport = () => {
       },
       (accessToken, refreshToken, profile, done) => {
         //check if user already exists in our db with the given profile ID
-        User.get(profile.id)
+        User.get({ id: profile.id })
           .then((currentUser) => {
             if (currentUser) {
               //if we already have a record with the given profile ID
