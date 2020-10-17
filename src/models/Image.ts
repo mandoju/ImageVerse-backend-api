@@ -8,30 +8,23 @@ interface ImageAttributes {
   url: string;
 }
 
-// Some attributes are optional in `User.build` and `User.create` calls
 interface ImageCreationAttributes extends Optional<ImageAttributes, 'id'> {}
 
 class Image
   extends Model<ImageAttributes, ImageCreationAttributes>
   implements ImageAttributes {
-  public id!: number; // Note that the `null assertion` `!` is required in strict mode.
+  public id!: number;
   public title!: string;
-  public url!: string; // for nullable fields
+  public url!: string;
+  public UserId!: number;
 
-  // timestamps!
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
-  // Since TS cannot determine model association at compile time
-  // we have to declare them here purely virtually
-  // these will not exist until `Model.init` was called.
-
-  // You can also pre-declare possible inclusions, these will only be populated if you
-  // actively include a relation.
-  public readonly user?: User; // Note this is optional since it's only populated when explicitly requested in code
+  public readonly User?: User;
 
   public static associations: {
-    creator: Association<Image, User>;
+    User: Association<Image, User>;
   };
 }
 Image.init(

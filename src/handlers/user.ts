@@ -1,4 +1,3 @@
-import { Condition } from 'dynamoose';
 import { Router } from 'express';
 import { Image } from '../models/Image';
 import { isAuthenticated } from '../utils/passport';
@@ -11,9 +10,8 @@ routes.get('/', isAuthenticated, async (req, res) => {
 
 routes.get('/images', isAuthenticated, async (req, res) => {
   //@ts-ignore
-  const UserId: string = req.user!.id;
-  // TODO: Change to query for better performance
-  // @ts-ignore: dynamoose type error.
+  const UserId: number = req.user!.id;
+  //@ts-ignore
   const images = await Image.findAll({ where: { UserId } });
   return res.json(images);
 });

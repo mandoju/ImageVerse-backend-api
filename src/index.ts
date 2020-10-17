@@ -3,7 +3,6 @@ import express from 'express';
 import { ImageRoutes } from './handlers/image';
 import { configurePassport } from './utils/passport';
 import { AuthRoutes } from './handlers/auth';
-import session from 'express-session';
 import passport from 'passport';
 import { getApiEnviromentVariables } from './utils/enviroment';
 import { UserRoutes } from './handlers/user';
@@ -19,9 +18,7 @@ try {
   console.error('Unable to connect to the database:', error);
 }
 sequelize.sync({ alter: true });
-// if (process.env.NODE_ENV === 'development') {
-//   dynamoose.aws.ddb.local('http://localhost:8001');
-// }
+
 configurePassport();
 
 const app = express();

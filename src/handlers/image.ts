@@ -1,5 +1,3 @@
-import { Condition } from 'dynamoose';
-import { SortOrder } from 'dynamoose/dist/General';
 import { Router } from 'express';
 import { Image } from '../models/Image';
 import { User } from '../models/User';
