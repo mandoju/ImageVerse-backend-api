@@ -64,3 +64,11 @@ export const getEnviromentDatabaseVariables = () => {
 
   return { dbHost, dbPort, dbName, dbUsername, dbPassword };
 };
+
+export const getJwtEnviromentVariables = () => {
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret) {
+    throw new Error('missing jwt secret variable');
+  }
+  return { jwtSecret };
+};
