@@ -1,5 +1,8 @@
 import { Router } from 'express';
+import { sign } from 'jsonwebtoken';
 import passport from 'passport';
+import { User } from '../models/User';
+import { getJwtEnviromentVariables } from '../utils/enviroment';
 import { isAuthenticated } from '../utils/passport';
 
 const routes = Router();
@@ -17,7 +20,20 @@ routes.get(
     scope: ['profile', 'email']
   }),
   (req, res) => {
-    res.send(req.user);
+    if (!req.user) {
+      return res.status(400).send('Missing user');
+    }
+    const { jwtSecret } = getJwtEnviromentVariables();
+
+    let token = sign(
+      {
+        data: req.user
+      },
+      jwtSecret,
+      { expiresIn: 60 }
+    ); // expiry in seconds
+    res.cookie('jwt', token);
+    res.redirect('/');
   }
 );
 

@@ -12,7 +12,7 @@ import {
 } from './utils/enviroment';
 import { UserRoutes } from './handlers/user';
 import { LikeRoutes } from './handlers/like';
-import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 
 const sdk = dynamoose.aws.sdk;
 sdk.config.update({
@@ -26,19 +26,8 @@ configurePassport();
 const app = express();
 const port = getApiEnviromentVariables().port;
 
-app.use(
-  session({
-    // milliseconds of a day
-    secret: getApiEnviromentVariables().cookieKey,
-    resave: false,
-    cookie: {
-      secure: false,
-      maxAge: 60 * 60 * 1000 * 24 * 365
-    }
-  })
-);
+app.use(cookieParser());
 app.use(passport.initialize());
-app.use(passport.session());
 
 app.use('/images', ImageRoutes);
 app.use('/auth', AuthRoutes);

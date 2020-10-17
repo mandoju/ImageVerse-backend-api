@@ -1,12 +1,36 @@
 import { Request, Response, NextFunction } from 'express';
 import passport from 'passport';
 import { Strategy } from 'passport-google-oauth20';
+import * as PassportJwt from 'passport-jwt';
 import { User } from '../models/User';
-import { getGoogleEnviromentVariables } from './enviroment';
+import {
+  getGoogleEnviromentVariables,
+  getJwtEnviromentVariables
+} from './enviroment';
 
 const googleKeys = getGoogleEnviromentVariables();
+const jwtOpts = {
+  secretOrKey: getJwtEnviromentVariables().jwtSecret,
+  jwtFromRequest: (req: Request) => {
+    // tell passport to read JWT from cookies
+    var token = null;
+    if (req && req.cookies) {
+      token = req.cookies['jwt'];
+    }
+    return token;
+  }
+};
 
 export const configurePassport = () => {
+  passport.use(
+    new PassportJwt.Strategy(jwtOpts, (jwt_payload, done) => {
+      if (CheckUser(jwt_payload.data)) {
+        return done(null, jwt_payload.data);
+      } else {
+        return done(null, false);
+      }
+    })
+  );
   passport.use(
     new Strategy(
       {
@@ -55,13 +79,19 @@ export const configurePassport = () => {
   });
 };
 
-export function isAuthenticated(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  if (req.user) {
-    return next();
-  }
-  res.status(401).json({ message: 'not authenticated!' });
+export const isAuthenticated = passport.authenticate('jwt', { session: false });
+// export function isAuthenticated(
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) {
+//   if (req.user) {
+//     return next();
+//   }
+//   res.status(401).json({ message: 'not authenticated!' });
+// }
+
+function CheckUser(input: { id: string; provider: string }) {
+  if (input.id && input.provider) return true; // found
+  return false;
 }
