@@ -12,19 +12,9 @@ routes.get('/', isAuthenticated, async (req, res) => {
 routes.get('/images', isAuthenticated, async (req, res) => {
   //@ts-ignore
   const userId: string = req.user!.id;
-  const condition = new Condition({
-    FilterExpression: '#creator = :id',
-    ExpressionAttributeValues: {
-      ':id': userId
-    },
-    ExpressionAttributeNames: {
-      '#creator': 'creator',
-      '#id': 'id'
-    }
-  });
   // TODO: Change to query for better performance
   // @ts-ignore: dynamoose type error.
-  const images = await Image.scan(condition).exec();
+  const images = await Image.findAll({ where: { creator: userid } });
   return res.json({ images });
 });
 

@@ -16,23 +16,21 @@ export const configurePassport = () => {
       },
       (accessToken, refreshToken, profile, done) => {
         //check if user already exists in our db with the given profile ID
-        User.get(profile.id)
+        User.findOne({ where: { providerId: profile.id } })
           .then((currentUser) => {
             if (currentUser) {
               //if we already have a record with the given profile ID
-              done(undefined, currentUser);
+              done(undefined, currentUser.toJSON());
             } else {
               //if not, create a new user
-              new User({
-                id: profile.id,
+              User.create({
+                providerId: profile.id,
                 email: profile.emails ? profile.emails[0].value || '' : '',
                 name: profile.displayName,
                 provider: 'google'
-              })
-                .save()
-                .then((newUser) => {
-                  done(undefined, { ...newUser });
-                });
+              }).then((newUser) => {
+                done(undefined, newUser.toJSON());
+              });
             }
           })
           .catch((err) => {
@@ -46,11 +44,11 @@ export const configurePassport = () => {
     done(null, user);
   });
 
-  passport.deserializeUser((id, done) => {
+  passport.deserializeUser((user: User, done) => {
     // TODO: TypeCheck of id
     // @ts-ignore
-    User.get(id).then((user) => {
-      done(null, { ...user });
+    User.findByPk(user.id).then((u) => {
+      u ? done(null, u.toJSON()) : done(new Error('User doesnt exist'));
     });
   });
 };

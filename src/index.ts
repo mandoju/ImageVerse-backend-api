@@ -21,6 +21,7 @@ try {
 } catch (error) {
   console.error('Unable to connect to the database:', error);
 }
+sequelize.sync({ alter: true });
 // if (process.env.NODE_ENV === 'development') {
 //   dynamoose.aws.ddb.local('http://localhost:8001');
 // }

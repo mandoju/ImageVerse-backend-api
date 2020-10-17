@@ -2,8 +2,6 @@ import { Router } from 'express';
 import { bodyParserBodyMiddleware } from '../middlewares/bodyParser';
 import { Image } from '../models/Image';
 import { Like } from '../models/Like';
-import { User } from '../models/User';
-import { upload } from '../services/image-upload';
 import { isAuthenticated } from '../utils/passport';
 
 const routes = Router();
@@ -23,13 +21,13 @@ routes.post(
       const checkLiked = await Like.get({ userId, imageId }); //de(userId);
       if (checkLiked) {
         Like.delete({ userId, imageId });
-        Image.update({ id: imageId }, { $ADD: { likeCount: -1 } });
+        //Image.update({ id: imageId }, { $ADD: { likeCount: -1 } });
       } else {
         await Like.create({
           userId,
           imageId
         });
-        Image.update({ id: imageId }, { $ADD: { likeCount: 1 } });
+        //Image.update({ id: imageId }, { $ADD: { likeCount: 1 } });
       }
       return res.json();
     } catch (error) {
