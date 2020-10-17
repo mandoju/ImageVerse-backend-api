@@ -55,9 +55,13 @@ Image.init(
     sequelize // passing the `sequelize` instance is required
   }
 );
-Image.belongsTo(User, { targetKey: 'id', foreignKey: 'creator' });
-Image.belongsToMany(User, { through: typeof Like, as: 'usersLiked' });
-User.belongsToMany(Image, { through: typeof Like, as: 'imagesLiked' });
+Image.belongsTo(User, {
+  targetKey: 'id'
+});
+// @ts-ignore
+Image.belongsToMany(User, { through: Like, as: 'usersLiked' });
+// @ts-ignore
+User.belongsToMany(Image, { through: Like, as: 'imagesLiked' });
 User.hasMany(Image);
 
 export { Image };

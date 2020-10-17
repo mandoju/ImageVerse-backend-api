@@ -3,8 +3,6 @@ import { sequelize } from '../services/database';
 import { User } from './User';
 import { Image } from './Image';
 interface LikeAttributes {
-  userId: number;
-  imageId: number;
   type: boolean;
 }
 
@@ -14,32 +12,24 @@ interface LikeCreationAttributes extends LikeAttributes {}
 class Like
   extends Model<LikeAttributes, LikeCreationAttributes>
   implements LikeAttributes {
-  public userId!: number;
-  public imageId!: number;
   public type!: boolean;
+  public UserId!: number;
+  public ImageId!: number;
 
   // timestamps
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
-  public readonly user?: User;
-  public readonly image?: Image;
+  public readonly User?: User;
+  public readonly Image?: Image;
 
   public static associations: {
-    user: Association<User, Like>;
-    image: Association<Image, Like>;
+    User: Association<User, Like>;
+    Image: Association<Image, Like>;
   };
 }
 Like.init(
   {
-    userId: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      primaryKey: true
-    },
-    imageId: {
-      type: DataTypes.STRING,
-      primaryKey: true
-    },
     type: {
       type: DataTypes.BOOLEAN,
       allowNull: true
@@ -50,7 +40,7 @@ Like.init(
     sequelize // passing the `sequelize` instance is required
   }
 );
-// Like.belongsTo(User, { targetKey: 'id', foreignKey: 'userId' });
-// Like.belongsTo(Image, { targetKey: 'id', foreignKey: 'imageId' });
+//Like.belongsTo(User, { targetKey: 'id', foreignKey: 'userId' });
+// Like.belongsTo(Image, { targetKey: 'id' });
 
 export { Like };

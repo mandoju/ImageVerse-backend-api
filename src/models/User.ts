@@ -11,6 +11,7 @@ import {
   Optional
 } from 'sequelize';
 import { sequelize } from '../services/database';
+import { Like } from './Like';
 
 interface UserAttributes {
   id: number;
@@ -44,6 +45,12 @@ class User
   public hasImage!: HasManyHasAssociationMixin<Image, number>;
   public countImagess!: HasManyCountAssociationsMixin;
   public createImage!: HasManyCreateAssociationMixin<Image>;
+
+  public getImagesLiked!: HasManyGetAssociationsMixin<Like>; // Note the null assertions!
+  public getImageLiked!: HasManyAddAssociationMixin<Like, number>;
+  public hasImageLiked!: HasManyHasAssociationMixin<Like, number>;
+  public countImageLiked!: HasManyCountAssociationsMixin;
+  public createImageLiked!: HasManyCreateAssociationMixin<Like>;
 
   // You can also pre-declare possible inclusions, these will only be populated if you
   // actively include a relation.

@@ -11,6 +11,7 @@ const singleUpload = upload.single('image');
 
 routes.get('/', async (req, res) => {
   const images = await Image.findAll({
+    include: 'User',
     limit: 20,
     order: [['createdAt', 'DESC']]
   });
@@ -34,7 +35,7 @@ routes.post('/', isAuthenticated, async (req, res) => {
     }
     try {
       //@ts-ignore
-      const user = await User.findOne({ where: { id: req.params.id } });
+      const user = await User.findOne({ where: { id: req.user.id } });
       if (!user) {
         throw new Error('User does not exist!');
       }
