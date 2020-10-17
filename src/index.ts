@@ -1,26 +1,24 @@
 require('dotenv').config();
 import express from 'express';
-import * as dynamoose from 'dynamoose';
 import { ImageRoutes } from './handlers/image';
 import { configurePassport } from './utils/passport';
 import { AuthRoutes } from './handlers/auth';
-import session from 'express-session';
 import passport from 'passport';
-import {
-  getApiEnviromentVariables,
-  getAwsEnviromentVariables
-} from './utils/enviroment';
+import { getApiEnviromentVariables } from './utils/enviroment';
 import { UserRoutes } from './handlers/user';
 import { LikeRoutes } from './handlers/like';
 import cookieParser from 'cookie-parser';
+import { sequelize } from './services/database';
 
-const sdk = dynamoose.aws.sdk;
-sdk.config.update({
-  region: getAwsEnviromentVariables().awsRegion
-});
-// if (process.env.NODE_ENV === 'development') {
-//   dynamoose.aws.ddb.local('http://localhost:8001');
-// }
+try {
+  sequelize
+    .authenticate()
+    .then(() => console.log('Connection has been established successfully.'));
+} catch (error) {
+  console.error('Unable to connect to the database:', error);
+}
+sequelize.sync({ alter: true });
+
 configurePassport();
 
 const app = express();

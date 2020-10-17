@@ -1,36 +1,60 @@
-import * as dynamoose from 'dynamoose';
-import { Schema } from 'dynamoose';
-import * as uuid from 'uuid';
-import { User, UserSchema } from './User';
+import { Model, DataTypes, Association, Optional } from 'sequelize';
+import { sequelize } from '../services/database';
+import { Like } from './Like';
+import { User } from './User';
+interface ImageAttributes {
+  id: number;
+  title: string;
+  url: string;
+}
 
-const imageSchema = new dynamoose.Schema(
+interface ImageCreationAttributes extends Optional<ImageAttributes, 'id'> {}
+
+class Image
+  extends Model<ImageAttributes, ImageCreationAttributes>
+  implements ImageAttributes {
+  public id!: number;
+  public title!: string;
+  public url!: string;
+  public UserId!: number;
+
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
+
+  public readonly User?: User;
+
+  public static associations: {
+    User: Association<Image, User>;
+  };
+}
+Image.init(
   {
     id: {
-      type: String,
-      hashKey: true,
-      default: uuid.v1
+      type: DataTypes.INTEGER.UNSIGNED,
+      autoIncrement: true,
+      primaryKey: true
     },
     title: {
-      type: String
+      type: new DataTypes.STRING(128),
+      allowNull: true
     },
     url: {
-      type: String
-    },
-    likeCount: {
-      type: Number,
-      default: 0
-    },
-    creator: {
-      // @ts-ignore: Right acordding argumentation
-      type: User,
-      index: {
-        name: 'creatorIndex',
-        global: true
-      }
+      type: new DataTypes.STRING(256),
+      allowNull: false
     }
   },
   {
-    timestamps: true
+    tableName: 'image',
+    sequelize // passing the `sequelize` instance is required
   }
 );
-export const Image = dynamoose.model('Image', imageSchema);
+Image.belongsTo(User, {
+  targetKey: 'id'
+});
+// @ts-ignore
+Image.belongsToMany(User, { through: Like, as: 'usersLiked' });
+// @ts-ignore
+User.belongsToMany(Image, { through: Like, as: 'imagesLiked' });
+User.hasMany(Image);
+
+export { Image };

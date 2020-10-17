@@ -4,9 +4,9 @@ import passport from 'passport';
 import { uid } from 'rand-token';
 import { Token } from '../models/Token';
 import { User } from '../models/User';
-import { getJwtEnviromentVariables } from '../utils/enviroment';
 import { isAuthenticated } from '../utils/passport';
 import { bodyParserBodyMiddleware } from '../middlewares/bodyParser';
+import { getJwtEnviromentVariables } from '../utils/enviroment';
 
 const routes = Router();
 
@@ -28,6 +28,7 @@ routes.get(
     }
     //@ts-ignore
     const userId = req.user.id;
+    console.log(req.user);
     const { jwtSecret } = getJwtEnviromentVariables();
 
     let acessToken = sign(
@@ -37,30 +38,34 @@ routes.get(
       jwtSecret,
       { expiresIn: 60 }
     ); // expiry in seconds
-
-    const refreshToken = await Token.create({ tokenId: uid(256), userId });
-    refreshToken.save();
-    console.log(refreshToken);
+    console.log(userId);
+    const refreshToken = await Token.create({
+      tokenId: uid(256),
+      userId
+    });
     res.cookie('jwt', acessToken);
-    res.cookie('refreshToken', refreshToken.toJSON().tokenId);
+    res.cookie('refreshToken', refreshToken.tokenId);
     res.redirect('/');
   }
 );
 
 routes.post('/token', bodyParserBodyMiddleware, async (req, res) => {
-  const tokenId = req.cookies['refreshToken'];
+  const tokenId: string = req.cookies['refreshToken'];
   // @ts-ignore
-  const userId = req.body.userId;
+  const userId: string = req.body.userId;
   if (!tokenId || !userId) {
-    return res.status(400).send('missing refresh token or userId');
+    return res.status(400).json({ message: 'missing refresh token or userId' });
   }
-  const token = await Token.query({ tokenId, userId }).exec();
+  const token = await Token.findOne({ where: { tokenId, userId } });
   if (token) {
-    const user = await User.get({ id: userId });
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(500).json({ message: 'user does not exist' });
+    }
     const { jwtSecret } = getJwtEnviromentVariables();
     let acessToken = sign(
       {
-        data: user
+        data: user?.toJSON()
       },
       jwtSecret,
       { expiresIn: 60 }

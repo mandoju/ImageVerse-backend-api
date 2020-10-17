@@ -43,6 +43,28 @@ export const getApiEnviromentVariables = () => {
   };
 };
 
+export const getEnviromentDatabaseVariables = () => {
+  const dbHost = process.env.DATABASE_HOST;
+  const dbPort = Number(process.env.DATABASE_PORT) || 5432;
+  const dbName = process.env.DATABASE_NAME;
+  const dbUsername = process.env.DATABASE_USERNAME;
+  const dbPassword = process.env.DATABASE_PASSWORD;
+  if (!dbHost) {
+    throw new Error('Missing database host');
+  }
+  if (!dbName) {
+    throw new Error('Missing database name');
+  }
+  if (!dbUsername) {
+    throw new Error('Missing database username');
+  }
+  if (!dbPassword) {
+    throw new Error('Missing database password');
+  }
+
+  return { dbHost, dbPort, dbName, dbUsername, dbPassword };
+};
+
 export const getJwtEnviromentVariables = () => {
   const jwtSecret = process.env.JWT_SECRET;
   if (!jwtSecret) {

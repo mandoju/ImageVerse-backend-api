@@ -3,35 +3,37 @@ import { bodyParserBodyMiddleware } from '../middlewares/bodyParser';
 import { Image } from '../models/Image';
 import { Like } from '../models/Like';
 import { User } from '../models/User';
-import { upload } from '../services/image-upload';
 import { isAuthenticated } from '../utils/passport';
 
 const routes = Router();
 
 routes.post(
-  '/',
+  '/:id',
   isAuthenticated,
   bodyParserBodyMiddleware,
   async (req, res) => {
     try {
-      if (!req.body.id) {
+      //@ts-ignore
+      const UserId: number = Number(req.user!.id);
+      const ImageId: number = Number(req.params.id);
+      if (!ImageId) {
         res.send(400).send({ message: 'missing image id' });
       }
       //@ts-ignore
-      const userId: string = req.user!.id;
-      const imageId: string = req.body.id;
-      const checkLiked = await Like.get({ userId, imageId }); //de(userId);
+      const checkLiked = await Like.findOne({ where: { UserId, ImageId } });
       if (checkLiked) {
-        Like.delete({ userId, imageId });
-        Image.update({ id: imageId }, { $ADD: { likeCount: -1 } });
+        //@ts-ignore
+        Like.destroy({ where: { userId, imageId } });
       } else {
         await Like.create({
-          userId,
-          imageId
+          //@ts-ignore
+          UserId,
+          //@ts-ignore
+          ImageId,
+          type: true
         });
-        Image.update({ id: imageId }, { $ADD: { likeCount: 1 } });
       }
-      return res.json();
+      return res.json({ message: 'success' });
     } catch (error) {
       return res.status(500).send({
         errors: [{ title: 'Internal Server Error', detail: error }]
@@ -43,10 +45,16 @@ routes.post(
 routes.get('/user', isAuthenticated, async (req, res) => {
   try {
     //@ts-ignore
-    const userId: string = req.user!.id;
-    const userLikes = await Like.query({ userId }).all().exec(); //de(userId);
-    return res.json(userLikes);
+    const UserId: string = req.user!.id;
+    const user = await User.findByPk(UserId);
+    if (!user) {
+      return res.status(500).json({ message: 'User does not exist' });
+    }
+    //@ts-ignore
+    const likedImages = await user.getImagesLiked();
+    return res.json(likedImages);
   } catch (error) {
+    console.log(error.stack);
     return res.status(500).send({
       errors: [{ title: 'Internal Server Error', detail: error }]
     });
