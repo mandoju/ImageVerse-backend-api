@@ -18,11 +18,12 @@ routes.post(
       const ImageId: number = Number(req.params.id);
       let type: string = req.body.type;
       if (!type) {
-        return res.send(400).send({ message: 'missing like type' });
+        return res.status(400).send({ message: 'missing like type' });
       }
       if (!ImageId) {
-        return res.send(400).send({ message: 'missing image id' });
+        return res.status(400).send({ message: 'missing image id' });
       }
+      console.log(UserId);
       //@ts-ignore
       const checkLiked = await Like.findOne({ where: { UserId, ImageId } });
       if (type === 'remove') {
@@ -30,7 +31,7 @@ routes.post(
         return res.json({ message: 'like deleted' });
       }
       if (checkLiked) {
-        checkLiked.update({
+        await checkLiked.update({
           ...checkLiked,
           type
         });
