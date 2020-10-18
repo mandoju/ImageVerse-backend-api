@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import passport from 'passport';
 import { Sequelize } from 'sequelize';
 import { Image } from '../models/Image';
 import { Like } from '../models/Like';
@@ -9,42 +10,63 @@ import { isAuthenticated } from '../utils/passport';
 const routes = Router();
 const singleUpload = upload.single('image');
 
-routes.get('/', async (req, res) => {
-  const page = Number(req.query.page) || 0;
-  const offset = page * 20;
-  var attributes: any[] = Object.keys(Image.rawAttributes);
-  attributes.push([
-    Sequelize.literal(
-      '(SELECT COUNT(*) FROM "like" where "like"."ImageId" = "Image"."id" and "like"."type" = \'like\')'
-    ),
-    'likesCount'
-  ]);
-  attributes.push([
-    Sequelize.literal(
-      '(SELECT COUNT(*) FROM "like" where "like"."ImageId" = "Image"."id" and "like"."type" = \'dislike\')'
-    ),
-    'dislikesCount'
-  ]);
-  const images = await Image.findAll({
-    attributes,
-    include: [
+routes.get(
+  '/',
+  passport.authenticate(['jwt', 'anonymous'], { session: false }),
+  async (req, res, next) => {
+    const page = Number(req.query.page) || 0;
+    const offset = page * 20;
+    var attributes: any[] = Object.keys(Image.rawAttributes);
+    attributes.push([
+      Sequelize.literal(
+        '(SELECT COUNT(*) FROM "like" where "like"."ImageId" = "Image"."id" and "like"."type" = \'like\')'
+      ),
+      'likesCount'
+    ]);
+    attributes.push([
+      Sequelize.literal(
+        '(SELECT COUNT(*) FROM "like" where "like"."ImageId" = "Image"."id" and "like"."type" = \'dislike\')'
+      ),
+      'dislikesCount'
+    ]);
+    if (req.user) {
       //@ts-ignore
-      { model: User, attributes: ['id', 'name'] },
-      {
+      const userId = req.user?.id;
+
+      attributes.push([
+        Sequelize.literal(
+          `(SELECT EXISTS (SELECT type FROM "like" where "like"."ImageId" = "Image"."id" and "like"."type" = 'like' and "like"."UserId" = ${userId}))`
+        ),
+        'liked'
+      ]);
+      attributes.push([
+        Sequelize.literal(
+          `(SELECT EXISTS (SELECT type FROM "like" where "like"."ImageId" = "Image"."id" and "like"."type" = 'dislike' and "like"."UserId" = ${userId}))`
+        ),
+        'disliked'
+      ]);
+    }
+    const images = await Image.findAll({
+      attributes,
+      include: [
         //@ts-ignore
-        model: Like,
-        required: false,
-        attributes: [],
-        group: ['likes'],
-        where: { type: 'like' }
-      }
-    ],
-    limit: 20,
-    offset,
-    order: [['createdAt', 'DESC']]
-  });
-  return res.json({ images });
-});
+        { model: User, attributes: ['id', 'name'] },
+        {
+          //@ts-ignore
+          model: Like,
+          required: false,
+          attributes: [],
+          group: ['likes'],
+          where: { type: 'like' }
+        }
+      ],
+      limit: 20,
+      offset,
+      order: [['createdAt', 'DESC']]
+    });
+    return res.json({ images });
+  }
+);
 
 routes.get<{ id: string }>('/:id', async (req, res) => {
   if (!req.params.id) {
