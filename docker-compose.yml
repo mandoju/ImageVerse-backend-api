@@ -1,0 +1,28 @@
+# Use postgres/example user/password credentials
+version: '3.5'
+
+services:
+    db:
+        image: postgres:alpine
+        restart: always
+        ports:
+            - 5432:5432
+        environment:
+            POSTGRES_DB: imageverse
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            #PROD_PASSWORD 
+            #POSTGRES_PASSWORD: postgres_[8@fEoQlPdX64Kh<QdJ3
+            PGDATA: /data/postgres
+        volumes:
+            - busca_rede_credenciada_bd:/data/postgres
+        #ports:
+        #    - '5435:5432'
+
+#networks:
+#    proxy:
+#        name: proxy_net
+#    busca_rede_bd: {}
+
+volumes:
+    busca_rede_credenciada_bd: {}
