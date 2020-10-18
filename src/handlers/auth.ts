@@ -130,7 +130,10 @@ routes.post('/token', bodyParserBodyMiddleware, async (req, res) => {
 
 routes.get('/logout', isAuthenticated, (req, res) => {
   req.logout();
-  res.send({ message: 'ok' });
+  res.clearCookie('jwt');
+  res.clearCookie('refreshToken');
+  res.clearCookie('G_AUTHUSE_H');
+  res.redirect(getGoogleEnviromentVariables().webRedirect);
 });
 
 export const AuthRoutes = routes;
