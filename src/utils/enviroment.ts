@@ -1,16 +1,21 @@
 export const getGoogleEnviromentVariables = () => {
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+  const webRedirect = process.env.AUTH_WEB_REDIRECT;
   if (!clientId) {
     throw new Error('Missing google clientId');
   }
   if (!clientSecret) {
     throw new Error('Missing google client');
   }
+  if (!webRedirect) {
+    throw new Error('Missing google redirect');
+  }
 
   return {
     clientId,
-    clientSecret
+    clientSecret,
+    webRedirect
   };
 };
 

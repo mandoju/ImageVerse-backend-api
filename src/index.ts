@@ -24,8 +24,14 @@ configurePassport();
 
 const app = express();
 const port = getApiEnviromentVariables().port;
+var corsOption = {
+  origin: true,
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+  exposedHeaders: ['x-auth-token']
+};
 
-app.use(cors());
+app.use(cors(corsOption));
 app.use(cookieParser());
 app.use(passport.initialize());
 
