@@ -1,5 +1,7 @@
 import { Router } from 'express';
+import { Sequelize } from 'sequelize';
 import { Image } from '../models/Image';
+import { Like } from '../models/Like';
 import { User } from '../models/User';
 import { upload } from '../services/image-upload';
 import { isAuthenticated } from '../utils/passport';
@@ -10,8 +12,33 @@ const singleUpload = upload.single('image');
 routes.get('/', async (req, res) => {
   const page = Number(req.query.page) || 0;
   const offset = page * 20;
+  var attributes: any[] = Object.keys(Image.rawAttributes);
+  attributes.push([
+    Sequelize.literal(
+      '(SELECT COUNT(*) FROM "like" where "like"."ImageId" = "Image"."id" and "like"."type" = \'dislike\')'
+    ),
+    'likesCount'
+  ]);
+  attributes.push([
+    Sequelize.literal(
+      '(SELECT COUNT(*) FROM "like" where "like"."ImageId" = "Image"."id" and "like"."type" = \'dislike\')'
+    ),
+    'dislikesCount'
+  ]);
   const images = await Image.findAll({
-    include: 'User',
+    attributes,
+    include: [
+      //@ts-ignore
+      { model: User, attributes: ['id', 'name'] },
+      {
+        //@ts-ignore
+        model: Like,
+        required: false,
+        attributes: [],
+        group: ['likes'],
+        where: { type: 'like' }
+      }
+    ],
     limit: 20,
     offset,
     order: [['createdAt', 'DESC']]

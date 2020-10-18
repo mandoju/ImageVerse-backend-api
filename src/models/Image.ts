@@ -25,6 +25,7 @@ class Image
 
   public static associations: {
     User: Association<Image, User>;
+    Like: Association<Image, Like>;
   };
 }
 Image.init(
@@ -53,6 +54,7 @@ Image.belongsTo(User, {
 });
 // @ts-ignore
 Image.belongsToMany(User, { through: Like, as: 'usersLiked' });
+Image.hasMany(Like);
 // @ts-ignore
 User.belongsToMany(Image, { through: Like, as: 'imagesLiked' });
 User.hasMany(Image);
