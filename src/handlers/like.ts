@@ -2,7 +2,6 @@ import { Router } from 'express';
 import { bodyParserBodyMiddleware } from '../middlewares/bodyParser';
 import { Like } from '../models/Like';
 import { User } from '../models/User';
-import { checkLikeValue } from '../utils/like';
 import { isAuthenticated } from '../utils/passport';
 
 const routes = Router();
@@ -23,7 +22,6 @@ routes.post(
       if (!ImageId) {
         return res.status(400).send({ message: 'missing image id' });
       }
-      console.log(UserId);
       //@ts-ignore
       const checkLiked = await Like.findOne({ where: { UserId, ImageId } });
       if (type === 'remove') {
