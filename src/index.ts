@@ -9,6 +9,7 @@ import { UserRoutes } from './handlers/user';
 import { LikeRoutes } from './handlers/like';
 import cookieParser from 'cookie-parser';
 import { sequelize } from './services/database';
+import cors from 'cors';
 
 try {
   sequelize
@@ -24,6 +25,7 @@ configurePassport();
 const app = express();
 const port = getApiEnviromentVariables().port;
 
+app.use(cors());
 app.use(cookieParser());
 app.use(passport.initialize());
 
