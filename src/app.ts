@@ -4,7 +4,6 @@ import { ImageRoutes } from './handlers/image';
 import { configurePassport } from './utils/passport';
 import { AuthRoutes } from './handlers/auth';
 import passport from 'passport';
-import { getApiEnviromentVariables } from './utils/enviroment';
 import { UserRoutes } from './handlers/user';
 import { LikeRoutes } from './handlers/like';
 import cookieParser from 'cookie-parser';
