@@ -46,7 +46,8 @@ routes.post(
     } catch (error) {
       console.log(error.stack);
       return res.status(500).json({
-        errors: [{ title: 'Internal Server Error', detail: error.message }]
+        title: 'Internal Server Error',
+        detail: error.message
       });
     }
   }

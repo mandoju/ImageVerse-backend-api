@@ -6,6 +6,7 @@ import { Like } from '../models/Like';
 import { User } from '../models/User';
 import { upload } from '../services/image-upload';
 import { isAuthenticated } from '../utils/passport';
+import * as ImageManager from '../controllers/ImageManager';
 
 const routes = Router();
 const singleUpload = upload.single('image');
@@ -15,55 +16,8 @@ routes.get(
   passport.authenticate(['jwt', 'anonymous'], { session: false }),
   async (req, res, next) => {
     const page = Number(req.query.page) || 0;
-    const offset = page * 20;
-    var attributes: any[] = Object.keys(Image.rawAttributes);
-    attributes.push([
-      Sequelize.literal(
-        '(SELECT COUNT(*)::integer FROM "like" where "like"."ImageId" = "Image"."id" and "like"."type" = \'like\')'
-      ),
-      'likesCount'
-    ]);
-    attributes.push([
-      Sequelize.literal(
-        '(SELECT COUNT(*)::integer FROM "like" where "like"."ImageId" = "Image"."id" and "like"."type" = \'dislike\')'
-      ),
-      'dislikesCount'
-    ]);
-    if (req.user) {
-      //@ts-ignore
-      const userId = req.user?.id;
-
-      attributes.push([
-        Sequelize.literal(
-          `(SELECT EXISTS (SELECT type FROM "like" where "like"."ImageId" = "Image"."id" and "like"."type" = 'like' and "like"."UserId" = ${userId}))`
-        ),
-        'liked'
-      ]);
-      attributes.push([
-        Sequelize.literal(
-          `(SELECT EXISTS (SELECT type FROM "like" where "like"."ImageId" = "Image"."id" and "like"."type" = 'dislike' and "like"."UserId" = ${userId}))`
-        ),
-        'disliked'
-      ]);
-    }
-    const images = await Image.findAll({
-      attributes,
-      include: [
-        //@ts-ignore
-        { model: User, attributes: ['id', 'name'] },
-        {
-          //@ts-ignore
-          model: Like,
-          required: false,
-          attributes: [],
-          group: ['likes'],
-          where: { type: 'like' }
-        }
-      ],
-      limit: 20,
-      offset,
-      order: [['createdAt', 'DESC']]
-    });
+    const user = req.user;
+    const images = await ImageManager.getImages({ user, page });
     return res.json({ images });
   }
 );
@@ -79,50 +33,28 @@ routes.get<{ id: string }>('/:id', async (req, res) => {
 routes.post('/', isAuthenticated, async (req, res) => {
   singleUpload(req, res, async function (err: any) {
     if (err) {
-      return res.status(422).send({
-        errors: [{ title: 'Image Upload Error', detail: err.message }]
-      });
+      return res
+        .status(422)
+        .send({ title: 'Image Upload Error', message: err.message });
     }
     try {
-      //@ts-ignore
-      const user = await User.findOne({ where: { id: req.user.id } });
-      if (!user) {
-        throw new Error('User does not exist!');
-      }
-      const image = await user.createImage({
-        title: req.body.title,
-        // @ts-ignore : Problem o @type, attribute location does exist on file
-        url: req.file.location
-      });
+      const { file, user } = req;
+      const { title } = req.body;
+      const image = await ImageManager.createImage({ user, title, file });
       return res.json(image.toJSON());
     } catch (error) {
       console.log(error.stack);
-      return res.status(500).send({
-        errors: [{ title: 'Internal Server Error', detail: error }]
-      });
+      return res
+        .status(500)
+        .send({ title: 'Internal Server Error', detail: error });
     }
   });
 });
 
-routes.put<{ id: string }, any, any>(
-  '/:id',
-  isAuthenticated,
-  async (req, res) => {
-    const id = Number(req.params.id);
-
-    const newImage: Image = { ...req.body, id };
-    //@ts-ignore
-    const oldImage = await Image.findByPk(id);
-    if (!oldImage) {
-      return res.status(500).json({ message: 'image does not exist' });
-    }
-    const image = await oldImage.update(newImage);
-    return res.json(image.toJSON());
-  }
-);
-
 routes.delete('/:id', isAuthenticated, async (req, res) => {
-  await Image.destroy({ where: { id: req.params.id } });
+  const { id: idString } = req.params;
+  const id = Number(idString);
+  await ImageManager.destroyImage({ id });
   return res.json({ msg: 'Deleted' });
 });
 

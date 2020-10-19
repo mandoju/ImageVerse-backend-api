@@ -20,52 +20,6 @@ routes.get(
   })
 );
 
-routes.post(
-  '/google',
-  passport.authenticate(
-    'google',
-    {
-      session: false,
-      scope: ['profile', 'email']
-    },
-    function (req, res, next) {
-      if (!req.user) {
-        return res.send(401, 'User Not Authenticated');
-      }
-      req.auth = {
-        id: req.user.id
-      };
-
-      next();
-    }
-  ),
-  async (req, res) => {
-    if (!req.user) {
-      return res.status(400).send('Missing user');
-    }
-    //@ts-ignore
-    const userId = req.user.id;
-    console.log(req.user);
-    const { jwtSecret } = getJwtEnviromentVariables();
-
-    let acessToken = sign(
-      {
-        data: req.user
-      },
-      jwtSecret,
-      { expiresIn: 60 }
-    ); // expiry in seconds
-    console.log(userId);
-    const refreshToken = await Token.create({
-      tokenId: uid(256),
-      userId
-    });
-    res.cookie('jwt', acessToken);
-    res.cookie('refreshToken', refreshToken.tokenId);
-    res.send({ message: 'success' });
-  }
-);
-
 routes.get(
   '/google/redirect',
   passport.authenticate('google', {
