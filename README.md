@@ -3,7 +3,7 @@
 This is a rest api to serve Imageverse application.
 
 ## Quick Overview
-there are two aways to run this project, one using docker and another for development. To see about Routes, look at Wiki.
+there are two aways to run this project, one using docker and another for development. To see about Routes, look at Wiki about the [routes](https://github.com/mandoju/ImageVerse-backend-api/wiki/Routes).
 
 ### Running with Docker
  To run this project using docker, you need to adjust the enviroment variables inside docker-compose.yml. With enviroment variables configured you only need to execute the commands bellow to run the project:
