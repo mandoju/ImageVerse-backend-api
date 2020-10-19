@@ -20,6 +20,7 @@ services:
             GOOGLE_CLIENT_ID: xxxxxxxxx
             GOOGLE_CLIENT_SECRET: xxxxxxx
             AUTH_WEB_REDIRECT: http://localhost:3000
+            AUTH_WEB_DOMAIN: localhost:3000
             COOKIE_KEY: secret
             JWT_SECRET: secret
         ports:
