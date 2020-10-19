@@ -32,7 +32,6 @@ routes.get(
     }
     //@ts-ignore
     const userId = req.user.id;
-    console.log(req.user);
     const { jwtSecret } = getJwtEnviromentVariables();
 
     let acessToken = sign(
@@ -42,15 +41,15 @@ routes.get(
       jwtSecret,
       { expiresIn: 60 }
     ); // expiry in seconds
-    console.log(userId);
     const refreshToken = await Token.create({
       tokenId: uid(256),
       userId
     });
-    res.cookie('jwt', acessToken);
-    res.cookie('refreshToken', refreshToken.tokenId);
-    //res.send({ message: 'success' });
-    res.redirect(getGoogleEnviromentVariables().webRedirect);
+    const { webRedirect, webDomain } = getGoogleEnviromentVariables();
+    console.log(webDomain);
+    res.cookie('jwt', acessToken, { domain: webDomain });
+    res.cookie('refreshToken', refreshToken.tokenId, { domain: webDomain });
+    res.redirect(webRedirect);
   }
 );
 
@@ -75,7 +74,8 @@ routes.post('/token', bodyParserBodyMiddleware, async (req, res) => {
       jwtSecret,
       { expiresIn: 60 }
     );
-    res.cookie('jwt', acessToken);
+    const { webDomain } = getGoogleEnviromentVariables();
+    res.cookie('jwt', acessToken, { domain: webDomain });
     return res.json({ message: 'success' });
   } else {
     return res.status(401).send('No user');
@@ -84,9 +84,10 @@ routes.post('/token', bodyParserBodyMiddleware, async (req, res) => {
 
 routes.get('/logout', isAuthenticated, (req, res) => {
   req.logout();
-  res.clearCookie('jwt');
-  res.clearCookie('refreshToken');
-  res.clearCookie('G_AUTHUSE_H');
+  const { webDomain } = getGoogleEnviromentVariables();
+  res.clearCookie('jwt', { domain: webDomain });
+  res.clearCookie('refreshToken', { domain: webDomain });
+  res.clearCookie('G_AUTHUSE_H', { domain: webDomain });
   res.redirect(getGoogleEnviromentVariables().webRedirect);
 });
 

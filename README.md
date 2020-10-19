@@ -45,6 +45,7 @@ there are two aways to run this project, one using docker and another for develo
   - GOOGLE_CLIENT_ID: Oauth2 Google cliend id
   - GOOGLE_CLIENT_SECRET: Oauth2 Google client secret
   - AUTH_WEB_REDIRECT: frontend address (used to redirect after auth)
+  - AUTH_WEB_DOMAIN : frontend web domain
 
 ## Dependencies
  this project has some depencies: 
