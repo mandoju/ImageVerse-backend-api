@@ -7,4 +7,5 @@ COPY ./node_modules /home/node/app/node_modules
 
 EXPOSE 8000
 
-CMD ["node","index.js"]
+
+ENTRYPOINT ["node","index.js"]
