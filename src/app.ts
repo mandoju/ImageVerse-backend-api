@@ -9,6 +9,11 @@ import { LikeRoutes } from './handlers/like';
 import cookieParser from 'cookie-parser';
 import { sequelize } from './services/database';
 import cors from 'cors';
+import {
+  getAwsEnviromentVariables,
+  getGoogleEnviromentVariables
+} from './utils/enviroment';
+import AWS from 'aws-sdk';
 
 export const AppCreator = () => {
   try {
@@ -21,11 +26,19 @@ export const AppCreator = () => {
   }
   sequelize.sync({ alter: true });
 
+  const { awsAccessKey, awsSecretKey } = getAwsEnviromentVariables();
+  if (awsAccessKey && awsSecretKey) {
+    AWS.config.update({
+      accessKeyId: awsAccessKey,
+      secretAccessKey: awsSecretKey
+    });
+  }
+
   configurePassport();
 
   const app = express();
   var corsOption = {
-    origin: true,
+    origin: `${getGoogleEnviromentVariables().webRedirect}`,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
     exposedHeaders: ['x-auth-token']

@@ -35,6 +35,8 @@ there are two aways to run this project, one using docker and another for develo
  AWS enviroment variables:
   - AWS_REGION: Aws region to run aws sdk functions
   - AWS_IMAGES_BUCKET: Aws bucket endpoint
+  - AWS_ACCESS_KEY: Aws user access key
+  - AWS_SECRET_KEY: Aws user secret key
 
  API enviroment variables 
   - PORT: port which api will listen

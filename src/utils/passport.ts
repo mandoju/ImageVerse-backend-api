@@ -14,6 +14,7 @@ const jwtOpts = {
   secretOrKey: getJwtEnviromentVariables().jwtSecret,
   jwtFromRequest: (req: Request) => {
     // tell passport to read JWT from cookies
+    console.log(req.cookies);
     var token = null;
     if (req && req.cookies) {
       token = req.cookies['jwt'];
