@@ -19,13 +19,13 @@ routes.get(
     var attributes: any[] = Object.keys(Image.rawAttributes);
     attributes.push([
       Sequelize.literal(
-        '(SELECT COUNT(*) FROM "like" where "like"."ImageId" = "Image"."id" and "like"."type" = \'like\')'
+        '(SELECT COUNT(*)::integer FROM "like" where "like"."ImageId" = "Image"."id" and "like"."type" = \'like\')'
       ),
       'likesCount'
     ]);
     attributes.push([
       Sequelize.literal(
-        '(SELECT COUNT(*) FROM "like" where "like"."ImageId" = "Image"."id" and "like"."type" = \'dislike\')'
+        '(SELECT COUNT(*)::integer FROM "like" where "like"."ImageId" = "Image"."id" and "like"."type" = \'dislike\')'
       ),
       'dislikesCount'
     ]);
