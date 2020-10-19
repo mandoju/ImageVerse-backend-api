@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { bodyParserBodyMiddleware } from '../middlewares/bodyParser';
-import { User } from '../models/User';
 import { isAuthenticated } from '../utils/passport';
 import * as LikeManager from '../controllers/LikeManager';
 

@@ -1,9 +1,6 @@
 import { Router } from 'express';
 import passport from 'passport';
-import { Sequelize } from 'sequelize';
 import { Image } from '../models/Image';
-import { Like } from '../models/Like';
-import { User } from '../models/User';
 import { upload } from '../services/image-upload';
 import { isAuthenticated } from '../utils/passport';
 import * as ImageManager from '../controllers/ImageManager';
