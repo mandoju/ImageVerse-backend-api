@@ -7,6 +7,7 @@ import {
   getGoogleEnviromentVariables,
   getJwtEnviromentVariables
 } from './enviroment';
+import { Strategy as AnonymousStrategy } from 'passport-anonymous';
 
 const googleKeys = getGoogleEnviromentVariables();
 const jwtOpts = {
@@ -63,6 +64,7 @@ export const configurePassport = () => {
       }
     )
   );
+  passport.use(new AnonymousStrategy());
 
   passport.serializeUser((user, done) => {
     done(null, user);

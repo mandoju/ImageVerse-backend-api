@@ -6,7 +6,10 @@ import { Token } from '../models/Token';
 import { User } from '../models/User';
 import { isAuthenticated } from '../utils/passport';
 import { bodyParserBodyMiddleware } from '../middlewares/bodyParser';
-import { getJwtEnviromentVariables } from '../utils/enviroment';
+import {
+  getGoogleEnviromentVariables,
+  getJwtEnviromentVariables
+} from '../utils/enviroment';
 
 const routes = Router();
 
@@ -20,6 +23,7 @@ routes.get(
 routes.get(
   '/google/redirect',
   passport.authenticate('google', {
+    session: false,
     scope: ['profile', 'email']
   }),
   async (req, res) => {
@@ -45,7 +49,8 @@ routes.get(
     });
     res.cookie('jwt', acessToken);
     res.cookie('refreshToken', refreshToken.tokenId);
-    res.redirect('/');
+    //res.send({ message: 'success' });
+    res.redirect(getGoogleEnviromentVariables().webRedirect);
   }
 );
 
@@ -71,7 +76,7 @@ routes.post('/token', bodyParserBodyMiddleware, async (req, res) => {
       { expiresIn: 60 }
     );
     res.cookie('jwt', acessToken);
-    return res.json({ message: 'sucess' });
+    return res.json({ message: 'success' });
   } else {
     return res.status(401).send('No user');
   }
@@ -79,7 +84,10 @@ routes.post('/token', bodyParserBodyMiddleware, async (req, res) => {
 
 routes.get('/logout', isAuthenticated, (req, res) => {
   req.logout();
-  res.send({ message: 'ok' });
+  res.clearCookie('jwt');
+  res.clearCookie('refreshToken');
+  res.clearCookie('G_AUTHUSE_H');
+  res.redirect(getGoogleEnviromentVariables().webRedirect);
 });
 
 export const AuthRoutes = routes;

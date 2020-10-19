@@ -89,3 +89,4 @@ typings/
 
 # Configurações do vsCode
 .vsCode
+dist/

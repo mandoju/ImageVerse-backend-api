@@ -1,28 +1,42 @@
-# Use postgres/example user/password credentials
 version: '3.5'
 
 services:
-    db:
+     api-rede:
+        build: .
+        container_name: imageverse-backend-api
+        depends_on:
+            - db
+        restart: always
+        environment:
+            NODE_ENV: development
+            DATABASE_HOST: db
+            DATABASE_NAME: imageverse
+            DATABASE_USERNAME: postgres
+            DATABASE_PASSWORD: postgres
+            DATABASE_PORT: 5432
+            AWS_REGION: us-east-2
+            AWS_IMAGES_BUCKET: bucket.aws.com
+            PORT: 8000
+            GOOGLE_CLIENT_ID: xxxxxxxxx
+            GOOGLE_CLIENT_SECRET: xxxxxxx
+            AUTH_WEB_REDIRECT: http://localhost:3000
+            COOKIE_KEY: secret
+            JWT_SECRET: secret
+        ports:
+            - '8000:8000'
+        command: 'node /home/node/app/app.js'
+     db:
         image: postgres:alpine
         restart: always
-        ports:
-            - 5432:5432
         environment:
             POSTGRES_DB: imageverse
             POSTGRES_USER: postgres
             POSTGRES_PASSWORD: postgres
-            #PROD_PASSWORD 
-            #POSTGRES_PASSWORD: postgres_[8@fEoQlPdX64Kh<QdJ3
             PGDATA: /data/postgres
+        ports:
+            - '5432:5432'
         volumes:
-            - busca_rede_credenciada_bd:/data/postgres
-        #ports:
-        #    - '5435:5432'
-
-#networks:
-#    proxy:
-#        name: proxy_net
-#    busca_rede_bd: {}
+            - imageverse_bd:/data/postgres
 
 volumes:
-    busca_rede_credenciada_bd: {}
+    imageverse_bd: {}
