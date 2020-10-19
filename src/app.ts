@@ -9,6 +9,7 @@ import { LikeRoutes } from './handlers/like';
 import cookieParser from 'cookie-parser';
 import { sequelize } from './services/database';
 import cors from 'cors';
+import { getGoogleEnviromentVariables } from './utils/enviroment';
 
 export const AppCreator = () => {
   try {
@@ -25,7 +26,7 @@ export const AppCreator = () => {
 
   const app = express();
   var corsOption = {
-    origin: true,
+    origin: `${getGoogleEnviromentVariables().webRedirect}`,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
     exposedHeaders: ['x-auth-token']

@@ -76,7 +76,7 @@ routes.post('/token', bodyParserBodyMiddleware, async (req, res) => {
     );
     const { webDomain } = getGoogleEnviromentVariables();
     res.cookie('jwt', acessToken, { domain: webDomain });
-    return res.json({ message: 'success' });
+    return res.json({ message: 'success', jwt: acessToken });
   } else {
     return res.status(401).send('No user');
   }
