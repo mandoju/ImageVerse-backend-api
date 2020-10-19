@@ -9,7 +9,11 @@ import { LikeRoutes } from './handlers/like';
 import cookieParser from 'cookie-parser';
 import { sequelize } from './services/database';
 import cors from 'cors';
-import { getGoogleEnviromentVariables } from './utils/enviroment';
+import {
+  getAwsEnviromentVariables,
+  getGoogleEnviromentVariables
+} from './utils/enviroment';
+import AWS from 'aws-sdk';
 
 export const AppCreator = () => {
   try {
@@ -21,6 +25,14 @@ export const AppCreator = () => {
     throw new Error(error);
   }
   sequelize.sync({ alter: true });
+
+  const { awsAccessKey, awsSecretKey } = getAwsEnviromentVariables();
+  if (awsAccessKey && awsSecretKey) {
+    AWS.config.update({
+      accessKeyId: awsAccessKey,
+      secretAccessKey: awsSecretKey
+    });
+  }
 
   configurePassport();
 

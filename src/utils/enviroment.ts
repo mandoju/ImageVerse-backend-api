@@ -24,6 +24,8 @@ export const getGoogleEnviromentVariables = () => {
 export const getAwsEnviromentVariables = () => {
   const awsImagesBucket = process.env.AWS_IMAGES_BUCKET;
   const awsRegion = process.env.AWS_REGION;
+  const awsAccessKey = process.env.AWS_ACCESS_KEY;
+  const awsSecretKey = process.env.AWS_SECRET_KEY;
   if (!awsImagesBucket) {
     throw new Error('Missing aws bucket variable');
   }
@@ -33,7 +35,9 @@ export const getAwsEnviromentVariables = () => {
 
   return {
     awsImagesBucket,
-    awsRegion
+    awsRegion,
+    awsAccessKey,
+    awsSecretKey
   };
 };
 
